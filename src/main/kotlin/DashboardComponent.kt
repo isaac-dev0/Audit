@@ -1,2 +1,3 @@
-class DashboardComponent {
+open class DashboardComponent {
+    // ...
 }

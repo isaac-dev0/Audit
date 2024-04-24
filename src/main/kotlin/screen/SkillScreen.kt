@@ -7,14 +7,14 @@ import domain.User
 import repository.SkillRepository
 import repository.UserRepository
 
-class ProfileScreen(
+class SkillScreen(
     user: User,
     skillRepository: SkillRepository?,
     userRepository: UserRepository?
 ) : DashboardScreen(user, skillRepository, userRepository) {
     @Composable
     override fun createScreen() {
-        Text("Profile Screen")
+        Text("Skill Screen")
     }
 
     // Create more functions here...
