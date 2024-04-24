@@ -23,6 +23,7 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc10")
     implementation("cafe.adriel.voyager:voyager-tab-navigator:1.0.0-rc10")
     implementation("cafe.adriel.voyager:voyager-transitions:1.0.0-rc10")
+    implementation("org.mongodb:mongodb-driver-kotlin-sync:5.0.0")
 }
 
 compose.desktop {

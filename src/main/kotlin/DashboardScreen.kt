@@ -20,7 +20,7 @@ import screen.SkillScreen
 import screen.UserScreen
 
 abstract class DashboardScreen(
-    private val user: User,
+    private val user: User?,
     private val skillRepository: SkillRepository?,
     private val userRepository: UserRepository?
 ) : Screen {

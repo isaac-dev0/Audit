@@ -10,8 +10,12 @@ import utility.Seed
 @Composable
 @Preview
 fun App() {
-    Seed().seedUsers()
-    Seed().seedSkills()
+
+    val seed = Seed()
+
+    seed.insertUsers()
+    seed.insertSkills()
+
     MaterialTheme {
         Navigator(LoginScreen())
     }

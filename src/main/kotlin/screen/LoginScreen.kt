@@ -16,7 +16,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import component.ErrorAlertComponent
 import repository.UserRepository
-import java.lang.Error
 
 class LoginScreen : Screen {
     @Composable
@@ -66,11 +65,10 @@ class LoginScreen : Screen {
             Button(
                 onClick = {
                     val userRepository = UserRepository()
+                    println(userRepository.getUsers())
                     if (userRepository.isValidCredentials(username, password)) {
                         val authenticatedUser = userRepository.getUser(username)
-                        if (authenticatedUser != null) {
-                            navigator.push(ProfileScreen(authenticatedUser, null, null))
-                        }
+                        navigator.push(ProfileScreen(authenticatedUser, null, null))
                     } else {
                         showErrorAlert.value = true
                     }

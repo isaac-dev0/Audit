@@ -8,7 +8,7 @@ import repository.SkillRepository
 import repository.UserRepository
 
 class ProfileScreen(
-    user: User,
+    user: User?,
     skillRepository: SkillRepository?,
     userRepository: UserRepository?
 ) : DashboardScreen(user, skillRepository, userRepository) {
