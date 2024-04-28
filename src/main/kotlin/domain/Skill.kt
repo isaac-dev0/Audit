@@ -1,44 +1,20 @@
 package domain
 
 import domain.enum.Proficiency
-import java.util.UUID
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.types.ObjectId
 
-class Skill(
-    private val id: UUID,
-    private val title: String,
-    private val description: String,
-    private val category: String,
-    private val expiryDate: String,
-    private val proficiency: Proficiency,
-    private val notes: String
+data class Skill(
+    @BsonId
+    val _id: ObjectId? = null,
+    val title: String,
+    val description: String?,
+    val category: String?,
+    val expiryDate: String?,
+    val proficiency: Proficiency?,
+    val notes: String?
 ) {
 
-    fun getId(): UUID {
-        return id
-    }
-
-    fun getTitle(): String {
-        return title
-    }
-
-    fun getDescription(): String {
-        return description
-    }
-
-    fun getCategory(): String {
-        return category
-    }
-
-    fun getExpiryDate(): String {
-        return expiryDate
-    }
-
-    fun getProficiency(): Proficiency {
-        return proficiency
-    }
-
-    fun getNotes(): String {
-        return notes
-    }
+    fun getId(): ObjectId? = _id
 
 }

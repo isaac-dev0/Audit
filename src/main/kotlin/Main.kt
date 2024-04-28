@@ -11,10 +11,8 @@ import utility.Seed
 @Preview
 fun App() {
 
-    val seed = Seed()
-
-    seed.insertUsers()
-    seed.insertSkills()
+    Seed().insertUsers()
+    Seed().insertSkills()
 
     MaterialTheme {
         Navigator(LoginScreen())

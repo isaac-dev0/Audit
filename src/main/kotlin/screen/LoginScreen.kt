@@ -14,8 +14,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import component.ErrorAlertComponent
+import component.AlertComponent
 import repository.UserRepository
+import repository.UserRepository.Companion.userCollection
 
 class LoginScreen : Screen {
     @Composable
@@ -64,11 +65,10 @@ class LoginScreen : Screen {
             )
             Button(
                 onClick = {
-                    val userRepository = UserRepository()
-                    println(userRepository.getUsers())
-                    if (userRepository.isValidCredentials(username, password)) {
-                        val authenticatedUser = userRepository.getUser(username)
-                        navigator.push(ProfileScreen(authenticatedUser, null, null))
+                    val userRepository = UserRepository(userCollection)
+                    val user = userRepository.getUser(username)
+                    if (user != null && user.password == password) {
+                        navigator.push(ProfileScreen(user))
                     } else {
                         showErrorAlert.value = true
                     }
@@ -78,7 +78,7 @@ class LoginScreen : Screen {
             }
 
             if (showErrorAlert.value) {
-                ErrorAlertComponent().createComponent(
+                AlertComponent().createComponent(
                     message = "You have provided invalid login details.",
                     onDismissRequest = {
                         showErrorAlert.value = false

@@ -1,27 +1,62 @@
 package repository
 
+import com.mongodb.MongoException
+import com.mongodb.client.MongoCollection
+import com.mongodb.client.MongoDatabase
+import com.mongodb.client.MongoClient
+import com.mongodb.client.model.Filters
 import domain.Skill
+import managers.SkillManager
+import org.bson.Document
+import org.bson.types.ObjectId
+import utility.Constants.Companion.DATABASE_NAME
+import utility.DatabaseConnector
 
-class SkillRepository {
+class SkillRepository(
+    private val collection: MongoCollection<Skill>
+) : SkillManager {
 
-    private val skills: MutableList<Skill> = mutableListOf()
+    companion object {
+        private const val COLLECTION_NAME = "skills"
 
-    fun getSkills(): List<Skill> {
-        return skills
+        private val mongoClient: MongoClient = DatabaseConnector.getMongoClient()
+        private val database: MongoDatabase = mongoClient.getDatabase(DATABASE_NAME)
+        val skillCollection: MongoCollection<Skill> = database.getCollection(COLLECTION_NAME, Skill::class.java)
     }
 
-    fun createSkill(skill: Skill) {
-        if (skills.contains(skill)) {
-            throw Exception("A skill with these details already exists.")
+    override fun getSkills(): List<Skill> {
+        return collection.find().toList()
+    }
+
+    override fun getSkill(title: String): Skill? {
+        return collection.find(Filters.eq(Skill::title.name, title)).firstOrNull()
+    }
+
+    // Returns all unique titles in the form of a String
+    override fun getSkillTitles(): List<String> {
+        return collection.distinct("title", String::class.java).toList()
+    }
+
+    override fun createSkill(skill: Skill) {
+        val existingSkill = getSkill(skill.title)
+        if (existingSkill != null) {
+            println("Skill with title ${skill.title} already exists.")
+            return
         }
-        skills.add(skill)
-    }
 
-    fun deleteSkill(skill: Skill) {
-        if (!skills.contains(skill)) {
-            throw Exception("A skill with these details do not exist.")
+        try {
+            val result = collection.insertOne(skill)
+            println("Success! Inserted document ID: " + result.insertedId)
+        } catch (e: MongoException) {
+            println("Unable to insert due to an error: $e")
         }
-        skills.remove(skill)
     }
 
+    override fun deleteSkill(skill: Skill) {
+        skill._id?.let { collection.deleteOneById(it) }
+    }
+
+    private fun MongoCollection<Skill>.deleteOneById(id: ObjectId) {
+        this.findOneAndDelete(Document("_id", id))
+    }
 }

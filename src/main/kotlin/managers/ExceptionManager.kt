@@ -1,0 +1,5 @@
+package managers
+
+interface ExceptionManager {
+    // ...
+}

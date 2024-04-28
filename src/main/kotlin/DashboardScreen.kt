@@ -20,9 +20,7 @@ import screen.SkillScreen
 import screen.UserScreen
 
 abstract class DashboardScreen(
-    private val user: User?,
-    private val skillRepository: SkillRepository?,
-    private val userRepository: UserRepository?
+    val user: User?,
 ) : Screen {
     @Composable
     override fun Content() {
@@ -30,7 +28,7 @@ abstract class DashboardScreen(
         val navigator = LocalNavigator.currentOrThrow
 
         val items = listOf(
-            Pair(Icons.Default.Home, "Profile"),
+            Pair(Icons.Default.Home, "Home"),
             Pair(Icons.Default.Person, "Users"),
             Pair(Icons.Default.Build, "Skills"),
             Pair(Icons.Default.ExitToApp, "Logout")
@@ -38,9 +36,9 @@ abstract class DashboardScreen(
 
         val onItemClick: (String) -> Unit = { clickedItem ->
             when (clickedItem) {
-                "Home" -> navigator.push(ProfileScreen(user, skillRepository, userRepository))
-                "Users" -> navigator.push(UserScreen(user, skillRepository, userRepository))
-                "Skills" -> navigator.push(SkillScreen(user, skillRepository, userRepository))
+                "Home" -> navigator.push(ProfileScreen(user))
+                "Users" -> navigator.push(UserScreen(user))
+                "Skills" -> navigator.push(SkillScreen(user))
                 "Logout" -> navigator.push(LoginScreen())
             }
         }

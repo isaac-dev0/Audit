@@ -1,52 +1,101 @@
 package domain
 
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Updates
 import domain.enum.Group
 import domain.enum.Job
-import java.util.UUID
+import domain.enum.Permission
+import domain.enum.Proficiency
+import org.bson.Document
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.types.ObjectId
+import repository.UserRepository
+import repository.UserRepository.Companion.userCollection
 
-class User(
-    private val id: UUID,
+data class User(
+    @BsonId
+    val _id: ObjectId? = null,
     val username: String,
     val password: String,
-    private val forename: String,
-    private val surname: String,
-    private val group: Group?,
-    private var skills: List<String>? = mutableListOf(),
-    private val parent: String? = "",
-    private val job: Job,
-    private val children: List<String>? = mutableListOf()
+    val forename: String,
+    val surname: String,
+    val group: Group?,
+    var skills: MutableList<Skill> = mutableListOf(),
+    val parent: String? = "",
+    val job: Job,
+    val children: MutableList<String> = mutableListOf()
 ) {
 
-    fun getId(): UUID {
-        return id
+    fun getUserId(): ObjectId? = _id
+
+    fun getUserForename(): String = forename
+
+    fun getUserSurname(): String = surname
+
+    fun getUserGroup(): Group? = group
+
+    fun getUserSkills(): List<Skill> {
+        return skills.toList()
     }
 
-    fun getForename(): String {
-        return forename
+    fun hasPermission(username: String, permission: Permission): Boolean {
+        val userRepository = UserRepository(userCollection)
+        val user = userRepository.getUser(username)
+        return user?.let { permission in it.group!!.permissions } ?: false
     }
 
-    fun getSurname(): String {
-        return surname
+    fun getUserParent(): String? = parent
+
+    fun getUserJob(): Job = job
+
+    fun getUserChildren(): List<String> = children.toList()
+
+    fun addSkill(title: String, proficiency: Proficiency, notes: String, expiryDate: String) {
+        val userRepository = UserRepository(userCollection)
+        val user = userRepository.getUser(username)
+        if (user != null) {
+            val existingSkill = user.skills.find { it.title == title }
+            if (existingSkill != null) {
+                println("Skill $title already exists for user $username.")
+                return
+            }
+            val newSkill = Skill(
+                ObjectId.get(),
+                title = title,
+                proficiency = proficiency,
+                notes = notes,
+                category = null,
+                description = null,
+                expiryDate = expiryDate
+            )
+            skills.add(newSkill)
+            val filter = Filters.eq("username", user.username)
+            val updateDocument = Document("\$set", Document("skills", user.skills.map { skill ->
+                Document("title", skill.title)
+                    .append("proficiency", skill.proficiency)
+                    .append("notes", skill.notes)
+                    .append("expiryDate", skill.expiryDate)
+            }))
+            userCollection.updateOne(filter, updateDocument)
+        } else {
+            println("User $username not found.")
+        }
     }
 
-    fun getGroup(): Group? {
-        return group
+    fun removeSkill(skillId: ObjectId) {
+        skills.removeIf { it._id == skillId }
+
+        val filter = Filters.eq("_id", _id)
+        val updateUser = Updates.pull("skills", Document("id", skillId))
+        userCollection.updateOne(filter, updateUser)
     }
 
-    fun getSkills(): List<String>? {
-        return skills
+    fun addChild(child: String) {
+        children.add(child)
     }
 
-    fun getParent(): String? {
-        return parent
-    }
-
-    fun getJob(): Job {
-        return job
-    }
-
-    fun getChildren(): List<String>? {
-        return children
+    fun removeChild(child: String) {
+        children.remove(child)
     }
 
 }

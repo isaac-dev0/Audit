@@ -1,81 +1,95 @@
 package utility
 
-import com.mongodb.client.MongoDatabase
-import com.mongodb.client.MongoCollection
+import domain.Skill
 import domain.User
 import domain.enum.Group
 import domain.enum.Job
-import org.bson.Document
+import domain.enum.Proficiency
+import org.bson.types.ObjectId
 import repository.SkillRepository
+import repository.SkillRepository.Companion.skillCollection
 import repository.UserRepository
+import repository.UserRepository.Companion.userCollection
 
 class Seed {
-
-    private val uuidGenerator = GenerateUUID()
-
-    private val mongoClient = DatabaseConnector.getMongoClient()
-    private val database: MongoDatabase = mongoClient.getDatabase("audit")
-
     fun insertUsers() {
-        val collection: MongoCollection<Document> = database.getCollection("users")
-
-        val user = Document("username", "john.smith@audit.com")
-            .append("password", "root")
-
-        collection.insertOne(user)
-
-        mongoClient.close()
-    }
-
-    fun insertSkills() {
-        val collection: MongoCollection<Document> = database.getCollection("skills")
-
-        val skill = Document("title", "JUnit")
-            .append("category", "Java")
-
-        collection.insertOne(skill)
-
-        mongoClient.close()
-    }
-
-    fun seedUsers() {
-        val userRepository = UserRepository()
-        userRepository.addUser(
+        val userRepository = UserRepository(userCollection)
+        userRepository.createUser(
             User(
-                uuidGenerator.generateNewUUID(),
-                "john.smith@audit.com",
-                "password",
-                "John",
-                "Smith",
-                Group.MANAGER,
-                listOf(
-                    "Communication"
+                _id = ObjectId.get(),
+                username = "john.smith@audit.com",
+                password = "password",
+                forename = "John",
+                surname = "Smith",
+                group = Group.MANAGER,
+                skills = mutableListOf(
+                    Skill(
+                        _id = ObjectId.get(),
+                        title = "Communication",
+                        description = "Communication is an important skill!",
+                        category = "Soft Skills",
+                        expiryDate = "23/05/2025",
+                        proficiency = Proficiency.BEGINNER,
+                        notes = "I'm not great at this :/"
+                    )
                 ),
-                "",
-                Job.SENIOR_DEVELOPER,
-                listOf(
+                parent = "",
+                job = Job.SENIOR_DEVELOPER,
+                children = mutableListOf(
                     "alex.grist@audit.com"
                 )
             )
         )
-        userRepository.addUser(
+        userRepository.createUser(
             User(
-                uuidGenerator.generateNewUUID(),
-                "alex.grist@audit.com",
-                "password",
-                "Alex",
-                "Grist",
-                Group.STAFF_USER,
-                listOf(
-                    "Teamwork"
+                _id = ObjectId.get(),
+                username = "alex.grist@audit.com",
+                password = "password",
+                forename = "Alex",
+                surname = "Grist",
+                group = Group.STAFF_USER,
+                skills = mutableListOf(
+                    Skill(
+                        _id = ObjectId.get(),
+                        title = "Teamwork",
+                        description = "Teamwork is an important skill!",
+                        category = "Soft Skills",
+                        expiryDate = "23/05/2025",
+                        proficiency = Proficiency.BEGINNER,
+                        notes = "I'm not great at this :/"
+                    )
                 ),
-                "john.smith@audit.com",
-                Job.JUNIOR_DEVELOPER
+                parent = "john.smith@audit.com",
+                job = Job.JUNIOR_DEVELOPER,
+                children = mutableListOf()
             )
         )
     }
 
-    fun seedSkills() {
-        val skillRepository = SkillRepository()
+    fun insertSkills() {
+        val skillRepository = SkillRepository(skillCollection)
+        skillRepository.createSkill(
+            Skill(
+                _id = ObjectId.get(),
+                title = "JUnit",
+                description = "JUnit is a Java unit testing library.",
+                category = "Java",
+                expiryDate = null,
+                proficiency = null,
+                notes = null
+            )
+        )
+        skillRepository.createSkill(
+            Skill(
+                _id = ObjectId.get(),
+                title = "Microsoft Word",
+                description = "Microsoft Word is a word processing tool developed by Microsoft",
+                category = "Microsoft Office",
+                expiryDate = null,
+                proficiency = null,
+                notes = null
+            )
+        )
     }
+
 }

@@ -1,19 +1,18 @@
 package component
 
-import DashboardComponent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
-class NavigationComponent : DashboardComponent() {
+class NavigationComponent {
     @Composable
     fun createComponent(
         listItems: List<Pair<ImageVector, String>>,
@@ -35,7 +34,8 @@ class NavigationComponent : DashboardComponent() {
                         .height(48.dp)
                         .width(48.dp)
                         .clickable { onItemClick(title) }
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = icon,
@@ -50,6 +50,5 @@ class NavigationComponent : DashboardComponent() {
                 }
             }
         }
-        Text("Navigation Component")
     }
 }
