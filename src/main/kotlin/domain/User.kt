@@ -44,6 +44,12 @@ data class User(
         return user?.let { permission in it.group!!.permissions } ?: false
     }
 
+    fun hasSkill(username: String, skill: Skill): Boolean {
+        val userRepository = UserRepository(userCollection)
+        val user = userRepository.getUser(username)
+        return user?.let { skill in it.skills } ?: false
+    }
+
     fun getUserParent(): String? = parent
 
     fun getUserJob(): Job = job

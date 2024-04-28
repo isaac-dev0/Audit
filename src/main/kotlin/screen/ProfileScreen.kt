@@ -2,6 +2,7 @@ package screen
 
 import DashboardScreen
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,35 +29,41 @@ class ProfileScreen(
 ) : DashboardScreen(user) {
     @Composable
     override fun createScreen() {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.Top
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                displayInformation()
+            item {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    displayInformation()
+                }
             }
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                displayUserSkills()
+            item {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    displayUserSkills()
+                }
             }
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                displayEmployees()
+            item {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    displayEmployees()
+                }
             }
         }
 
@@ -298,29 +305,117 @@ class ProfileScreen(
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun displayEmployees() {
+        val userRepository = UserRepository(userCollection)
         val hasViewStaff by remember { mutableStateOf(user?.hasPermission(user.username, Permission.VIEW_STAFF)) }
+        val availableGroups = listOf(Group.STAFF_USER, Group.MANAGER, Group.ADMINISTRATOR)
+
+        var selectedGroup by remember { mutableStateOf<Group?>(null) }
+        var selectedSkill by remember { mutableStateOf<Skill?>(null) }
+
         if (hasViewStaff == true) {
             Column {
-                Text(
-                    text = "Staff",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(
-                    modifier = Modifier
-                        .size(4.dp)
-                )
-                Divider()
-                Spacer(
-                    modifier = Modifier
-                        .size(16.dp)
-                )
-                user?.children?.forEach { child ->
-                    Text(child)
+
+                ExposedDropdownMenuBox(
+                    expanded = selectedGroup != null,
+                    onExpandedChange = { expanded ->
+                        if (!expanded) {
+                            selectedGroup = null
+                        }
+                    }
+                ) {
+                    ExposedDropdownMenu(
+                        expanded = selectedGroup != null,
+                        onDismissRequest = { selectedGroup = null }
+                    ) {
+                        availableGroups.forEach { group ->
+                            DropdownMenuItem(onClick = { selectedGroup = group }) {
+                                Text(group.toString())
+                            }
+                        }
+                    }
+                }
+
+                ExposedDropdownMenuBox(
+                    expanded = selectedSkill != null,
+                    onExpandedChange = { expanded ->
+                        if (!expanded) {
+                            selectedSkill = null
+                        }
+                    }
+                ) {
+                    ExposedDropdownMenu(
+                        expanded = selectedSkill != null,
+                        onDismissRequest = { selectedSkill = null }
+                    ) {
+                        user?.skills?.forEach { skill ->
+                            DropdownMenuItem(onClick = { selectedSkill = skill }) {
+                                Text(skill.title)
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                user?.children?.let { children ->
+                    val filteredChildren = children.filter { child ->
+                        val user = userRepository.getUser(child)
+                        selectedGroup?.let { group -> user?.group == group } ?: true &&
+                                selectedSkill?.let { skill -> user?.hasSkill(user.username, skill) ?: false } ?: true
+                    }
+
+                    filteredChildren.forEach { child ->
+                        userRepository.getUser(child)?.let { newUser ->
+                            UserCard(user = newUser)
+                        }
+                    }
                 }
             }
         }
+    }
+    @Composable
+    fun UserCard(user: User?) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text(
+                    text = "${user?.forename} ${user?.surname}",
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Username: ${user?.username}",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Job: ${user?.job?.title}",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Group: ${user?.group}",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Skills: ${user?.getUserSkills()}",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+        Divider()
     }
 }

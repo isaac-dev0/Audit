@@ -56,6 +56,16 @@ class SkillRepository(
         skill._id?.let { collection.deleteOneById(it) }
     }
 
+    fun updateSkill(updatedSkill: Skill) {
+        val filter = Filters.eq("_id", updatedSkill._id)
+        val updateDocument = Document("\$set", Document(mapOf(
+            "title" to updatedSkill.title,
+            "description" to updatedSkill.description,
+            "category" to updatedSkill.category
+        )))
+        collection.updateOne(filter, updateDocument)
+    }
+
     private fun MongoCollection<Skill>.deleteOneById(id: ObjectId) {
         this.findOneAndDelete(Document("_id", id))
     }

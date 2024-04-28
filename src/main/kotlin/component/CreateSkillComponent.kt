@@ -36,7 +36,7 @@ class CreateSkillComponent {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Add Skill")
+                    Text("Create Skill")
                     Spacer(
                         modifier = Modifier
                             .size(16.dp)

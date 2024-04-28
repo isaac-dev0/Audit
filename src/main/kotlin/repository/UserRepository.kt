@@ -27,7 +27,11 @@ class UserRepository(
         val filter = Filters.eq("_id", updatedUser._id)
         val updateDocument = Document("\$set", Document(mapOf(
             "forename" to updatedUser.forename,
-            "surname" to updatedUser.surname
+            "surname" to updatedUser.surname,
+            "username" to updatedUser.username,
+            "password" to updatedUser.password,
+            "job" to updatedUser.job,
+            "group" to updatedUser.group
         )))
         collection.updateOne(filter, updateDocument)
     }
@@ -54,13 +58,15 @@ class UserRepository(
         }
     }
 
-    fun updateUserSkills(user: User) {
-        val filter = Filters.eq("_id", user._id)
-        val updateDocument = Document("\$set", Document("skills", user.skills.map { skill ->
-            Document("title", skill.title)
-                .append("proficiency", skill.proficiency)
-                .append("notes", skill.notes)
-        }))
-        userCollection.updateOne(filter, updateDocument)
-    }
+
+    // Need to integrate this into P2.
+//    fun updateUserSkills(user: User) {
+//        val filter = Filters.eq("_id", user._id)
+//        val updateDocument = Document("\$set", Document("skills", user.skills.map { skill ->
+//            Document("title", skill.title)
+//                .append("proficiency", skill.proficiency)
+//                .append("notes", skill.notes)
+//        }))
+//        userCollection.updateOne(filter, updateDocument)
+//    }
 }
