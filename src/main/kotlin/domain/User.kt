@@ -1,7 +1,6 @@
 package domain
 
 import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Updates
 import domain.enum.Group
 import domain.enum.Job
 import domain.enum.Permission
@@ -25,19 +24,6 @@ data class User(
     val job: Job,
     val children: MutableList<String> = mutableListOf()
 ) {
-
-    fun getUserId(): ObjectId? = _id
-
-    fun getUserForename(): String = forename
-
-    fun getUserSurname(): String = surname
-
-    fun getUserGroup(): Group? = group
-
-    fun getUserSkills(): List<Skill> {
-        return skills.toList()
-    }
-
     fun hasPermission(username: String, permission: Permission): Boolean {
         val userRepository = UserRepository(userCollection)
         val user = userRepository.getUser(username)
@@ -49,12 +35,6 @@ data class User(
         val user = userRepository.getUser(username)
         return user?.let { skill in it.skills } ?: false
     }
-
-    fun getUserParent(): String? = parent
-
-    fun getUserJob(): Job = job
-
-    fun getUserChildren(): List<String> = children.toList()
 
     fun addSkill(title: String, proficiency: Proficiency, notes: String, expiryDate: String) {
         val userRepository = UserRepository(userCollection)
@@ -87,21 +67,4 @@ data class User(
             println("User $username not found.")
         }
     }
-
-    fun removeSkill(skillId: ObjectId) {
-        skills.removeIf { it._id == skillId }
-
-        val filter = Filters.eq("_id", _id)
-        val updateUser = Updates.pull("skills", Document("id", skillId))
-        userCollection.updateOne(filter, updateUser)
-    }
-
-    fun addChild(child: String) {
-        children.add(child)
-    }
-
-    fun removeChild(child: String) {
-        children.remove(child)
-    }
-
 }

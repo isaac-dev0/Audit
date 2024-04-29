@@ -20,6 +20,7 @@ import component.CreateUserComponent
 import domain.User
 import domain.enum.Group
 import domain.enum.Job
+import domain.enum.Permission
 import org.bson.types.ObjectId
 import repository.UserRepository
 import repository.UserRepository.Companion.userCollection
@@ -212,6 +213,7 @@ class UserScreen(
         val userRepository = rememberSaveable { UserRepository(userCollection) }
         var isCreateUserVisible = remember { mutableStateOf(false) }
         var showUserEditDialog by remember { mutableStateOf(false) }
+        val hasEditStaff by remember { mutableStateOf(user?.hasPermission(user.username, Permission.EDIT_STAFF)) }
         Column {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -224,12 +226,14 @@ class UserScreen(
                     )
                 }
                 Column {
-                    TextButton(
-                        onClick = {
-                            isCreateUserVisible.value = true
+                    if (hasEditStaff == true) {
+                        TextButton(
+                            onClick = {
+                                isCreateUserVisible.value = true
+                            }
+                        ) {
+                            Text("+")
                         }
-                    ) {
-                        Text("+")
                     }
                 }
             }
@@ -285,16 +289,18 @@ class UserScreen(
                                     modifier = Modifier
                                         .padding(8.dp)
                                 ) {
-                                    TextButton(
-                                        onClick = {
-                                            showUserEditDialog = true
+                                    if (hasEditStaff == true) {
+                                        TextButton(
+                                            onClick = {
+                                                showUserEditDialog = true
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp)
+                                            )
                                         }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(16.dp)
-                                        )
                                     }
                                 }
                             }

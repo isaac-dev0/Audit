@@ -13,8 +13,4 @@ data class Skill(
     val expiryDate: String?,
     val proficiency: Proficiency?,
     val notes: String?
-) {
-
-    fun getId(): ObjectId? = _id
-
-}
+)

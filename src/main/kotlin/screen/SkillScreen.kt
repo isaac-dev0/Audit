@@ -20,6 +20,7 @@ import androidx.compose.ui.window.Dialog
 import component.CreateSkillComponent
 import domain.Skill
 import domain.User
+import domain.enum.Permission
 import org.bson.types.ObjectId
 import repository.SkillRepository
 import repository.SkillRepository.Companion.skillCollection
@@ -29,6 +30,7 @@ class SkillScreen(
 ) : DashboardScreen(user) {
     @Composable
     override fun createScreen() {
+        val hasSkillView by remember { mutableStateOf(user?.hasPermission(user.username, Permission.VIEW_SKILLS)) }
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -41,7 +43,11 @@ class SkillScreen(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                displaySkills()
+                if (hasSkillView == true) {
+                    displaySkills()
+                } else {
+                    Text("Welp, you do not have permission to see this content!")
+                }
             }
         }
     }
@@ -100,6 +106,7 @@ class SkillScreen(
     fun skillCard(skill: Skill) {
         var showSkillEditDialog by remember { mutableStateOf(false) }
         val skillRepository = SkillRepository(skillCollection)
+        val hasEditSkill by remember { mutableStateOf(user?.hasPermission(user.username, Permission.EDIT_SKILLS)) }
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -150,17 +157,19 @@ class SkillScreen(
                     .padding(8.dp),
                 horizontalAlignment = Alignment.End
             ) {
-                TextButton(
-                    onClick = {
-                        showSkillEditDialog = true
+                if (hasEditSkill == true) {
+                    TextButton(
+                        onClick = {
+                            showSkillEditDialog = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(16.dp)
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(16.dp)
-                    )
                 }
             }
         }

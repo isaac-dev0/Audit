@@ -1,5 +1,0 @@
-package managers
-
-interface ExceptionManager {
-    // ...
-}

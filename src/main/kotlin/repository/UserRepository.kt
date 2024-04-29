@@ -7,9 +7,9 @@ import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
 import domain.User
 import managers.UserManager
-import utility.Constants.Companion.DATABASE_NAME
 import utility.DatabaseConnector
 import org.bson.Document
+import utility.DatabaseConnector.DATABASE_NAME
 
 class UserRepository(
     private val collection: MongoCollection<User>
@@ -23,18 +23,6 @@ class UserRepository(
             database.getCollection(COLLECTION_NAME, User::class.java)
     }
 
-    fun updateUser(updatedUser: User) {
-        val filter = Filters.eq("_id", updatedUser._id)
-        val updateDocument = Document("\$set", Document(mapOf(
-            "forename" to updatedUser.forename,
-            "surname" to updatedUser.surname,
-            "username" to updatedUser.username,
-            "password" to updatedUser.password,
-            "job" to updatedUser.job,
-            "group" to updatedUser.group
-        )))
-        collection.updateOne(filter, updateDocument)
-    }
     override fun getUsers(): List<User> {
         return collection.find().toList()
     }
@@ -58,15 +46,20 @@ class UserRepository(
         }
     }
 
-
-    // Need to integrate this into P2.
-//    fun updateUserSkills(user: User) {
-//        val filter = Filters.eq("_id", user._id)
-//        val updateDocument = Document("\$set", Document("skills", user.skills.map { skill ->
-//            Document("title", skill.title)
-//                .append("proficiency", skill.proficiency)
-//                .append("notes", skill.notes)
-//        }))
-//        userCollection.updateOne(filter, updateDocument)
-//    }
+    override fun updateUser(user: User) {
+        val filter = Filters.eq("_id", user._id)
+        val updateDocument = Document(
+            "\$set", Document(
+                mapOf(
+                    "forename" to user.forename,
+                    "surname" to user.surname,
+                    "username" to user.username,
+                    "password" to user.password,
+                    "job" to user.job,
+                    "group" to user.group
+                )
+            )
+        )
+        collection.updateOne(filter, updateDocument)
+    }
 }

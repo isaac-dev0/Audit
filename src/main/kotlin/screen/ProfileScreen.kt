@@ -317,65 +317,87 @@ class ProfileScreen(
 
         if (hasViewStaff == true) {
             Column {
-
-                ExposedDropdownMenuBox(
-                    expanded = selectedGroup != null,
-                    onExpandedChange = { expanded ->
-                        if (!expanded) {
-                            selectedGroup = null
+                Text("Staff")
+                Spacer(modifier = Modifier.size(4.dp))
+                Divider()
+                Spacer(modifier = Modifier.size(8.dp))
+                Column {
+                    Row {
+                        ExposedDropdownMenuBox(
+                            expanded = selectedGroup != null,
+                            onExpandedChange = { expanded ->
+                                if (!expanded) {
+                                    selectedGroup = null
+                                }
+                            }
+                        ) {
+                            ExposedDropdownMenu(
+                                expanded = selectedGroup != null,
+                                onDismissRequest = { selectedGroup = null }
+                            ) {
+                                availableGroups.forEach { group ->
+                                    DropdownMenuItem(onClick = { selectedGroup = group }) {
+                                        Text(group.toString())
+                                    }
+                                }
+                            }
                         }
-                    }
-                ) {
-                    ExposedDropdownMenu(
-                        expanded = selectedGroup != null,
-                        onDismissRequest = { selectedGroup = null }
-                    ) {
-                        availableGroups.forEach { group ->
-                            DropdownMenuItem(onClick = { selectedGroup = group }) {
-                                Text(group.toString())
+
+                        ExposedDropdownMenuBox(
+                            expanded = selectedSkill != null,
+                            onExpandedChange = { expanded ->
+                                if (!expanded) {
+                                    selectedSkill = null
+                                }
+                            }
+                        ) {
+                            selectedSkill?.let {
+                                TextField(
+                                    value = it.title,
+                                    onValueChange = { },
+                                    readOnly = true,
+                                    trailingIcon = {
+                                        ExposedDropdownMenuDefaults.TrailingIcon(
+                                            expanded = selectedSkill != null
+                                        )
+                                    },
+                                    colors = ExposedDropdownMenuDefaults.textFieldColors()
+                                )
+                            }
+                            ExposedDropdownMenu(
+                                expanded = selectedSkill != null,
+                                onDismissRequest = { selectedSkill = null }
+                            ) {
+                                user?.skills?.forEach { skill ->
+                                    DropdownMenuItem(onClick = { selectedSkill = skill }) {
+                                        Text(skill.title)
+                                    }
+                                }
                             }
                         }
                     }
-                }
 
-                ExposedDropdownMenuBox(
-                    expanded = selectedSkill != null,
-                    onExpandedChange = { expanded ->
-                        if (!expanded) {
-                            selectedSkill = null
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    user?.children?.let { children ->
+                        val filteredChildren = children.filter { child ->
+                            val user = userRepository.getUser(child)
+                            selectedGroup?.let { group -> user?.group == group } ?: true &&
+                                    selectedSkill?.let { skill -> user?.hasSkill(user.username, skill) ?: false } ?: true
                         }
-                    }
-                ) {
-                    ExposedDropdownMenu(
-                        expanded = selectedSkill != null,
-                        onDismissRequest = { selectedSkill = null }
-                    ) {
-                        user?.skills?.forEach { skill ->
-                            DropdownMenuItem(onClick = { selectedSkill = skill }) {
-                                Text(skill.title)
+
+                        filteredChildren.forEach { child ->
+                            userRepository.getUser(child)?.let { newUser ->
+                                UserCard(user = newUser)
                             }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                user?.children?.let { children ->
-                    val filteredChildren = children.filter { child ->
-                        val user = userRepository.getUser(child)
-                        selectedGroup?.let { group -> user?.group == group } ?: true &&
-                                selectedSkill?.let { skill -> user?.hasSkill(user.username, skill) ?: false } ?: true
-                    }
-
-                    filteredChildren.forEach { child ->
-                        userRepository.getUser(child)?.let { newUser ->
-                            UserCard(user = newUser)
                         }
                     }
                 }
             }
         }
     }
+
+
     @Composable
     fun UserCard(user: User?) {
         Card(
@@ -410,12 +432,11 @@ class ProfileScreen(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Skills: ${user?.getUserSkills()}",
+                    text = "Skills: ${user?.skills?.joinToString(", ") { it.title }}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
         }
-        Divider()
     }
 }

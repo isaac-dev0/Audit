@@ -7,4 +7,5 @@ interface UserManager {
     fun getUsers(): List<User>
     fun getUser(username: String): User?
     fun createUser(user: User)
+    fun updateUser(user: User)
 }

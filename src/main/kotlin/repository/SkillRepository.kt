@@ -9,8 +9,8 @@ import domain.Skill
 import managers.SkillManager
 import org.bson.Document
 import org.bson.types.ObjectId
-import utility.Constants.Companion.DATABASE_NAME
 import utility.DatabaseConnector
+import utility.DatabaseConnector.DATABASE_NAME
 
 class SkillRepository(
     private val collection: MongoCollection<Skill>
@@ -32,7 +32,6 @@ class SkillRepository(
         return collection.find(Filters.eq(Skill::title.name, title)).firstOrNull()
     }
 
-    // Returns all unique titles in the form of a String
     override fun getSkillTitles(): List<String> {
         return collection.distinct("title", String::class.java).toList()
     }
@@ -56,12 +55,12 @@ class SkillRepository(
         skill._id?.let { collection.deleteOneById(it) }
     }
 
-    fun updateSkill(updatedSkill: Skill) {
-        val filter = Filters.eq("_id", updatedSkill._id)
+    override fun updateSkill(skill: Skill) {
+        val filter = Filters.eq("_id", skill._id)
         val updateDocument = Document("\$set", Document(mapOf(
-            "title" to updatedSkill.title,
-            "description" to updatedSkill.description,
-            "category" to updatedSkill.category
+            "title" to skill.title,
+            "description" to skill.description,
+            "category" to skill.category
         )))
         collection.updateOne(filter, updateDocument)
     }

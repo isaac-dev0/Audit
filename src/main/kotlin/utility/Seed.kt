@@ -64,6 +64,74 @@ class Seed {
                 children = mutableListOf()
             )
         )
+
+        userRepository.createUser(
+            User(
+                _id = ObjectId.get(),
+                username = "another.user@example.com",
+                password = "password",
+                forename = "Another",
+                surname = "User",
+                group = Group.STAFF_USER,
+                skills = mutableListOf(
+                    Skill(
+                        _id = ObjectId.get(),
+                        title = "Problem Solving",
+                        description = "Problem solving is crucial in any role!",
+                        category = "Soft Skills",
+                        expiryDate = "23/05/2025",
+                        proficiency = Proficiency.ADVANCED,
+                        notes = "I excel in problem-solving tasks."
+                    ),
+                    Skill(
+                        _id = ObjectId.get(),
+                        title = "Coding",
+                        description = "Proficient in various programming languages.",
+                        category = "Technical Skills",
+                        expiryDate = "23/05/2025",
+                        proficiency = Proficiency.EXPERT,
+                        notes = "I have extensive experience in coding."
+                    )
+                ),
+                parent = "john.smith@audit.com",
+                job = Job.SENIOR_DEVELOPER,
+                children = mutableListOf()
+            )
+        )
+
+        userRepository.createUser(
+            User(
+                _id = ObjectId.get(),
+                username = "jane.doe@example.com",
+                password = "password",
+                forename = "Jane",
+                surname = "Doe",
+                group = Group.ADMINISTRATOR,
+                skills = mutableListOf(
+                    Skill(
+                        _id = ObjectId.get(),
+                        title = "Leadership",
+                        description = "Strong leadership skills.",
+                        category = "Soft Skills",
+                        expiryDate = "23/05/2025",
+                        proficiency = Proficiency.EXPERT,
+                        notes = "I have led teams in various projects."
+                    ),
+                    Skill(
+                        _id = ObjectId.get(),
+                        title = "Project Management",
+                        description = "Experienced in project management methodologies.",
+                        category = "Soft Skills",
+                        expiryDate = "23/05/2025",
+                        proficiency = Proficiency.ADVANCED,
+                        notes = "Managed multiple projects successfully."
+                    )
+                ),
+                parent = "",
+                job = Job.MID_LEVEL_DEVELOPER,
+                children = mutableListOf("another.user@example.com")
+            )
+        )
     }
 
     fun insertSkills() {

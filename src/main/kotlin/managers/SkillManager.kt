@@ -8,4 +8,5 @@ interface SkillManager {
     fun getSkillTitles(): List<String>
     fun createSkill(skill: Skill)
     fun deleteSkill(skill: Skill)
+    fun updateSkill(skill: Skill)
 }
