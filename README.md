@@ -1,5 +1,7 @@
 # Audit
 
+> IF THE APP DOES NOT BUILD, OPEN INTELLIJ TERMINAL AND RUN ./gradlew wrapper --gradle-version 5.5. This is because Gradle is not updated relative to the Java (20) version you're running.
+
 ## Bugs
 
 ### Global
